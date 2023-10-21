@@ -15,7 +15,6 @@ A CLI tool to simplify the process of cloning, building, and containerizing appl
 
 - Go (version 1.15 or newer)
 - Git
-- [pack CLI](https://buildpacks.io/docs/tools/pack/)
 - Docker or a compatible container runtime
 
 ### Installation
