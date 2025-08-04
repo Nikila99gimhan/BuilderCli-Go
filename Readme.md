@@ -44,6 +44,16 @@ A CLI tool to simplify the process of cloning, building, and containerizing appl
 ./mycliapp https://github.com/user/sample-app.git
 ```
 
+### Web UI
+
+A minimal web interface is also available for triggering builds from a browser.
+
+```bash
+go run cmd/web/main.go
+```
+
+Open `http://localhost:8080` and submit the repository URL, image name and tag to start the build process.
+
 ## Technical Details
 
 - **Modular Architecture**: The application is designed using Object-Oriented Principles in Go, with distinct modules for displaying content (`Display`), managing repositories (`RepoManager`), and building & tagging container images (`ImageBuilder`).
