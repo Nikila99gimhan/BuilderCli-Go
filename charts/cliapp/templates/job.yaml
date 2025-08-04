@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "cliapp.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "cliapp.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: cliapp
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: {{ toYaml .Values.command | nindent 12 }}
+          args: {{ toYaml .Values.args | nindent 12 }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
