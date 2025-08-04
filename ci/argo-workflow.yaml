@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: buildercli-pipeline
+spec:
+  entrypoint: pipeline
+  templates:
+  - name: pipeline
+    steps:
+    - - name: build
+        template: run-job
+        arguments:
+          parameters:
+          - name: ns
+            value: build-stage
+    - - name: test
+        template: run-job
+        arguments:
+          parameters:
+          - name: ns
+            value: test-stage
+    - - name: push
+        template: run-job
+        arguments:
+          parameters:
+          - name: ns
+            value: push-stage
+  - name: run-job
+    inputs:
+      parameters:
+      - name: ns
+    resource:
+      action: apply
+      manifest: |
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          generateName: {{inputs.parameters.ns}}-
+          namespace: {{inputs.parameters.ns}}
+        spec:
+          template:
+            spec:
+              restartPolicy: Never
+              containers:
+              - name: stage
+                image: alpine
+                command: ["sh","-c","echo running in {{inputs.parameters.ns}}"]
+

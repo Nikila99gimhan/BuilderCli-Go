@@ -115,3 +115,26 @@ A CLI tool to simplify the process of cloning, building, and containerizing appl
 5. Open a pull request.
 
 ---
+
+## Kubernetes Deployment
+
+A Helm chart is available in `charts/cliapp` for running the CLI inside a Kubernetes cluster using a `Job`. This makes installation and execution consistent across environments.
+
+```bash
+# Install the chart
+helm install mycli charts/cliapp --set image.repository=<your-repo> --set image.tag=<tag>
+```
+
+## Kubernetes-based CI Pipeline
+
+The `ci/` directory contains an example [Argo Workflow](https://argoproj.github.io/) that runs CI stages in separate namespaces, each as its own pod.
+
+```bash
+# Create isolated namespaces for each stage
+kubectl apply -f ci/namespaces.yaml
+
+# Submit the workflow (assuming Argo is installed in the cluster)
+kubectl create -f ci/argo-workflow.yaml -n argo
+```
+
+Each pipeline stage is executed as an individual Kubernetes `Job`, enabling fine-grained isolation and leveraging native primitives for orchestration.

@@ -1,0 +1,11 @@
+image:
+  repository: myregistry/mycliapp
+  tag: latest
+  pullPolicy: IfNotPresent
+
+command:
+  - "./mycliapp"
+args: []
+
+resources: {}
+
