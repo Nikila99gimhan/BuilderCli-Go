@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# .goreleaser.yaml — BuilderCLI release configuration
+# Docs: https://goreleaser.com/customization/
+
+version: 2
+
+project_name: buildercli
+
+before:
+  hooks:
+    # Tidy modules and run tests before every release.
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - id: buildercli
+    main: ./cmd/main.go
+    binary: buildercli
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      # Embed the version, commit, and build date into the binary at link time.
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: buildercli
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - Readme.md
+
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+  algorithm: sha256
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "Merge pull request"
+      - "Merge branch"
+  groups:
+    - title: "🚀 New Features"
+      regexp: "^feat"
+      order: 0
+    - title: "🐛 Bug Fixes"
+      regexp: "^fix"
+      order: 1
+    - title: "🔒 Security"
+      regexp: "^sec"
+      order: 2
+    - title: "Other Changes"
+      order: 999
+
+release:
+  github:
+    owner: ""   # Set your GitHub username/org here, or let goreleaser infer from git remote
+    name: ""    # Set your repository name here, or let goreleaser infer from git remote
+  name_template: "BuilderCLI v{{.Version}}"
+  header: |
+    ## BuilderCLI v{{.Version}}
+
+    Containerize and push any application with a single command.
+
+    ### Quick Install (macOS/Linux)
+    ```bash
+    curl -sSfL https://github.com/<owner>/BuilderCli-Go/releases/download/{{.Tag}}/buildercli_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m).tar.gz | tar -xz -C /usr/local/bin
+    ```
+  footer: |
+    **Full Changelog**: https://github.com/<owner>/BuilderCli-Go/compare/{{.PreviousTag}}...{{.Tag}}

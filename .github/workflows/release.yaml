@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    # Triggers ONLY when a version tag like v1.0.0 or v2.3.1 is pushed.
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write  # Required to create GitHub Releases
+
+jobs:
+  goreleaser:
+    name: Release with GoReleaser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Fetch all history and tags so GoReleaser can generate a full changelog.
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          # GITHUB_TOKEN is automatically provided by GitHub Actions.
+          # It is used to create the GitHub Release and upload assets.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

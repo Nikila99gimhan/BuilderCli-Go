@@ -1,20 +1,21 @@
 package utils
 
 import (
-	"fmt"
+	"github.com/go-git/go-git/v5"
 	"os"
-	"os/exec"
 )
 
+// Clone clones the given repoURL using the native go-git library, removing
+// the dependency on a host-installed `git` binary.
 func Clone(repoURL string) error {
 	repoName := GetRepoNameFromURL(repoURL)
 	if _, err := os.Stat(repoName); !os.IsNotExist(err) {
-		fmt.Println("Repository already exists locally. Skipping clone.")
-		return nil
+		return nil // Already exists locally, skip clone.
 	}
 
-	cmd := exec.Command("git", "clone", repoURL)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	_, err := git.PlainClone(repoName, false, &git.CloneOptions{
+		URL:      repoURL,
+		Progress: os.Stdout,
+	})
+	return err
 }
